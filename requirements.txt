@@ -12,3 +12,4 @@ textract
 openai
 tiktoken
 faiss-cpu
+youtube-transcript-api
