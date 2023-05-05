@@ -23,7 +23,7 @@ def main():
     for transcript in transcript_list:
         print(transcript.language_code)
 
-    url = st.text_input("https://youtu.be/Kp4Mvapo5kc")
+    url = st.text_input("Link de YouTube que deseas cuestionar. Por ejemplo: https://youtu.be/Kp4Mvapo5kc")
     
     # extract video ID using regular expression
     match = re.search(r"v=(\w+)", url)
@@ -38,7 +38,7 @@ def main():
         video_id = url.split("watch?v=")[-1]
 
     # asigna la variable 'language_code' con el código de idioma deseado
-    idioma = st.selectbox("Selecciona el idioma", ["en", "es", "fr"])
+    idioma = st.selectbox("Selecciona el idioma de los subtitulos, asegurate de que existan subtitulos en el video o marcará error", ["en", "es", "fr"])
 
     # obtiene el transcript en el idioma deseado
     srt = YouTubeTranscriptApi.get_transcript(video_id, languages=[idioma])
