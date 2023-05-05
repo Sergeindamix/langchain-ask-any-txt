@@ -23,7 +23,7 @@ def main():
     for transcript in transcript_list:
         print(transcript.language_code)
 
-    url = st.text_input("Link de YouTube que deseas cuestionar. Por ejemplo: https://youtu.be/Kp4Mvapo5kc")
+    url = st.text_input("https://youtu.be/Kp4Mvapo5kc")
     
     # extract video ID using regular expression
     match = re.search(r"v=(\w+)", url)
@@ -38,7 +38,7 @@ def main():
         video_id = url.split("watch?v=")[-1]
 
     # asigna la variable 'language_code' con el código de idioma deseado
-    idioma = st.selectbox("Selecciona el idioma de los subtitulos, asegurate de que existan subtitulos en el video o marcará error", ["en", "es", "fr"])
+    idioma = st.selectbox("Selecciona el idioma", ["en", "es", "fr"])
 
     # obtiene el transcript en el idioma deseado
     srt = YouTubeTranscriptApi.get_transcript(video_id, languages=[idioma])
@@ -47,26 +47,41 @@ def main():
     text = ""
     for subtitle in srt:
         text += subtitle['text'] + " "
+    
         
     # eliminar los caracteres de formato
     text = text.replace('\n', ' ').replace('\r', '')
     
-    # abrir el archivo para escribir
+    # Lee el archivo de subtítulos
     with open('subtitles.txt', 'w', encoding='utf-8') as file:
-        # escribir cada línea de subtítulos en el archivo
-        for line in srt:
-            text = line['text']
-            file.write(text + '\n')
+      # escribir cada línea de subtítulos en el archivo
+      for line in srt:
+          text = line['text']
+          file.write(text + '\n')
 
-    # split into chunks
-    text_splitter = CharacterTextSplitter(
-    
-      separator="\n",
-      chunk_size=1000,
-      chunk_overlap=200,
-      length_function=len
-    )
-    chunks = text_splitter.split_text(text)
+    if os.path.exists('subtitles.txt'):
+        text = textract.process('subtitles.txt').decode('utf-8')
+        os.remove('subtitles.txt')
+    else:
+        # handle file not found error
+        ...
+
+
+    # Define una función para dividir el texto en trozos de 2048 tokens
+    def split_text(text):
+      # Divide el texto en trozos de 512 tokens
+      tokens = text.split()
+      chunks = []
+      for i in range(0, len(tokens), 512):
+          chunk = ' '.join(tokens[i:i+512])
+          chunks.append(chunk)
+      return chunks
+
+        
+
+    # split into chunks    
+    chunks = split_text(text)
+    st.write(chunks)
     
     # create embeddings
     embeddings = OpenAIEmbeddings()
