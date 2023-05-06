@@ -18,9 +18,16 @@ from IPython.display import Audio, clear_output
 import tempfile
 import IPython
 import IPython.display as ipd
+from elevenlabs import generate, play, set_api_key, voices, Models
 
       
 eleven_api_key = "cb5bafe60ce95aa3cd258c16bc2b1a4d"
+
+
+voice_list = voices()
+voice_labels = [voice.category + " voice: " + voice.name for voice in voice_list]
+
+voice_id = st.selectbox("Selecciona una voz:", voice_labels)
 
 def generate_audio(text, voice_id):
     CHUNK_SIZE = 1024
@@ -134,42 +141,33 @@ def main():
           
       st.write(response)
 
-     
+      output_text = str(response)
+      st.write(output_text)
 
-      # Define la lista de voces disponibles
-      voices = [
-          {"name": "Adam", "id": "1"},
-          {"name": "Antony", "id": "2"},
-          # Agrega las voces que desees utilizar
-      ]
-
-      # Define una lista con los nombres de las voces disponibles
-      voice_names = [voice["name"] for voice in voices]
-
-      # Agrega un campo de texto para ingresar el texto a convertir en audio
-      text = response
-      
-      # Agrega un menú desplegable para seleccionar la voz
-      voice_name = st.selectbox("Selecciona la voz", voice_names)
-
-      # Busca el ID de la voz seleccionada
-      voice_id = [voice["id"] for voice in voices if voice["name"] == voice_name][0]
-
+      if response:
+          audio_datos = generate_audio(output_text, voice_id)
+          st.audio(audio_datos, format="audio/wav")
       # Genera el audio a partir del texto y la voz seleccionada
-      audio_datos = generate_audio(text, voice_id)
-      #display(Audio(audio_data, autoplay=True))
+      audio_datos = generate_audio(audio_datos, voice_id)
+
       # Load audio data from file
       with open(audio_datos, "rb") as f:
           audio_data = f.read()
 
-      # Display audio player
-      # Genera el audio
-      audio_url = generate_audio("Hola, esto es una prueba", "eleven_multilingual_v1")
+      # Save audio data as WAV file
+      import wave
 
-      # Muestra el audio en la interfaz
-      ipd.display(ipd.Audio(audio_url))
+      with wave.open("output.wav", "wb") as wav_file:
+          wav_file.setparams((1, 2, 16000, len(audio_data), 'NONE', 'not compressed'))
+          wav_file.writeframes(audio_data)
+
+
       
-      #st.audio(audio_data.export(format="mp3"), format="audio/mp3")
+      audio_file = open('output.wav', 'rb')
+      audio_bytes = audio_file.read()
+
+      st.audio(audio_bytes, format='audio/wav')
+      #st.audio(audio, format="audio/wav", start_time=0, sample_rate=None)
 
         
 def ytsub():
