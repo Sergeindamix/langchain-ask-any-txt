@@ -1,6 +1,5 @@
 faiss-cpu
 flask
-io
 langchain==0.0.154
 moviepy
 openai
