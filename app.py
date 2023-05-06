@@ -11,6 +11,24 @@ from langchain.llms import OpenAI
 from langchain.callbacks import get_openai_callback
 import os
 import textract
+import requests
+import io
+from pydub import AudioSegment
+
+def generate_audio(text, voice_id):
+    url = "https://www.eleven-labs.com/api/voice"
+    headers = {
+        "Content-Type": "application/json"
+    }
+    data = {
+        "text": text,
+        "voice": voice_id
+    }
+    response = requests.post(url, headers=headers, json=data)
+    audio_bytes = io.BytesIO(response.content)
+    audio = AudioSegment.from_file(audio_bytes, format="mp3")
+    return audio
+
 
 def main():
     load_dotenv()
