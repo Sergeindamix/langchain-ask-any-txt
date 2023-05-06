@@ -19,6 +19,7 @@ import tempfile
 import IPython
 import IPython.display as ipd
 from elevenlabs import generate, play, set_api_key, voices, Models
+from pydub.playback import play as play_audio
 
       
 eleven_api_key = "cb5bafe60ce95aa3cd258c16bc2b1a4d"
@@ -56,6 +57,11 @@ def generate_audio(text, voice_id):
 
     return temp_filename
 
+
+
+def play_audio_file(file_path):
+    audio = AudioSegment.from_file(file_path)
+    play_audio(audio)
 
 def main():
     load_dotenv()
@@ -126,7 +132,7 @@ def main():
     knowledge_base = FAISS.from_texts(chunks, embeddings)
     
     # show user input
-    user_question = st.text_input("Ask a question about your PDF:")
+    user_question = st.text_input("Ask a question about YouTube VIDEO:")
     if user_question:
 
     
@@ -141,34 +147,8 @@ def main():
           
       st.write(response)
 
-      output_text = str(response)
-      st.write(output_text)
-
-      if response:
-          audio_datos = generate_audio(output_text, voice_id)
-          st.audio(audio_datos, format="audio/wav")
-      # Genera el audio a partir del texto y la voz seleccionada
-      audio_datos = generate_audio(audio_datos, voice_id)
-
-      # Load audio data from file
-      with open(audio_datos, "rb") as f:
-          audio_data = f.read()
-
-      # Save audio data as WAV file
-      import wave
-
-      with wave.open("output.wav", "wb") as wav_file:
-          wav_file.setparams((1, 2, 16000, len(audio_data), 'NONE', 'not compressed'))
-          wav_file.writeframes(audio_data)
-
-
       
-      audio_file = open('output.wav', 'rb')
-      audio_bytes = audio_file.read()
-
-      st.audio(audio_bytes, format='audio/wav')
-      #st.audio(audio, format="audio/wav", start_time=0, sample_rate=None)
-
+      
         
 def ytsub():
     load_dotenv()
