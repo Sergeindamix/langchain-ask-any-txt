@@ -20,7 +20,7 @@ import IPython
 import IPython.display as ipd
 from elevenlabs import generate, play, set_api_key, voices, Models
 from pydub.playback import play as play_audio
-
+from io import BytesIO
       
 eleven_api_key = "cb5bafe60ce95aa3cd258c16bc2b1a4d"
 
@@ -30,32 +30,32 @@ voice_labels = [voice.category + " voice: " + voice.name for voice in voice_list
 
 voice_id = st.selectbox("Selecciona una voz:", voice_labels)
 
-def generate_audio(text, voice_id):
-    CHUNK_SIZE = 1024
-    url = "https://www.eleven-labs.com/api/voice"
+def generate_audio(text, speed):
+    tts_url = f"https://api.elevenlabs.io/v1/text-to-speech/{voice_id}/stream"
+
     headers = {
-      "Accept": "audio/mpeg",
-      "Content-Type": "application/json",
-      "xi-api-key": eleven_api_key
+        "Accept": "audio/mp3",
+        "xi-api-key": eleven_api_key
     }
+
     data = {
         "text": text,
-        "voice": "eleven_multilingual_v1",
         "voice_settings": {
-          "stability": 0.4,
-          "similarity_boost": 1.0
+            "speed": speed
         }
     }
-    response = requests.post(url, headers=headers, json=data)
-    # Save audio data to a temporary file
-    with tempfile.NamedTemporaryFile(delete=False, suffix=".mp3") as f:
-        for chunk in response.iter_content(chunk_size=CHUNK_SIZE):
-            if chunk:
-                f.write(chunk)
-        f.flush()
-        temp_filename = f.name
 
-    return temp_filename
+    response = requests.post(tts_url, json=data, headers=headers, stream=True)
+
+    if response.status_code == 200:
+        # convert the streamed mp3 data to a playable audio format
+        audio_data = BytesIO(response.content)
+        audio_segment = AudioSegment.from_file(audio_data, format="mp3")
+        return audio_segment
+    else:
+        st.warning(f"No se pudo generar el audio. El servidor devolvió el código de estado {response.status_code}.")
+        return None
+
 
 
 
@@ -147,8 +147,13 @@ def main():
           
       st.write(response)
 
-      
-      
+      speed = st.slider("Velocidad de habla", 0.5, 2.0, 1.0, 0.1)
+      audio_segment = generate_audio(response, speed)
+      if audio_segment is not None:
+          st.write("Respuesta generada:")
+          # reproducir el audio generado
+          st.audio(audio_segment.export(format="wav"), format="audio/wav", start_time=0)
+
         
 def ytsub():
     load_dotenv()
