@@ -14,34 +14,47 @@ import textract
 import requests
 import io
 from pydub import AudioSegment
+from IPython.display import Audio, clear_output
+import tempfile
+import IPython
+import IPython.display as ipd
+
+      
+eleven_api_key = "cb5bafe60ce95aa3cd258c16bc2b1a4d"
 
 def generate_audio(text, voice_id):
+    CHUNK_SIZE = 1024
     url = "https://www.eleven-labs.com/api/voice"
     headers = {
-        "Content-Type": "application/json"
+      "Accept": "audio/mpeg",
+      "Content-Type": "application/json",
+      "xi-api-key": eleven_api_key
     }
     data = {
         "text": text,
-        "voice": voice_id
+        "voice": "eleven_multilingual_v1",
+        "voice_settings": {
+          "stability": 0.4,
+          "similarity_boost": 1.0
+        }
     }
     response = requests.post(url, headers=headers, json=data)
-    audio_bytes = io.BytesIO(response.content)
-    audio = AudioSegment.from_file(audio_bytes, format="mp3")
-    return audio
+    # Save audio data to a temporary file
+    with tempfile.NamedTemporaryFile(delete=False, suffix=".mp3") as f:
+        for chunk in response.iter_content(chunk_size=CHUNK_SIZE):
+            if chunk:
+                f.write(chunk)
+        f.flush()
+        temp_filename = f.name
+
+    return temp_filename
 
 
 def main():
     load_dotenv()
-    if not os.path.exists('subs'):
-        os.makedirs('subs')
-
     
-    transcript_list = YouTubeTranscriptApi.list_transcripts("QPMlFxwlNyc")
 
-    for transcript in transcript_list:
-        print(transcript.language_code)
-
-    url = st.text_input("https://youtu.be/Kp4Mvapo5kc")
+    url = st.text_input("Ingresa link de YouTube, ejemplo: https://www.youtube.com/watch?v=KczJNtexinY")
     
     # extract video ID using regular expression
     match = re.search(r"v=(\w+)", url)
@@ -56,7 +69,7 @@ def main():
         video_id = url.split("watch?v=")[-1]
 
     # asigna la variable 'language_code' con el código de idioma deseado
-    idioma = st.selectbox("Selecciona el idioma", ["en", "es", "fr"])
+    idioma = st.selectbox("Selecciona el idioma de los subtitulos, si no existen mostrará error", ["en", "es", "fr"])
 
     # obtiene el transcript en el idioma deseado
     srt = YouTubeTranscriptApi.get_transcript(video_id, languages=[idioma])
@@ -120,6 +133,44 @@ def main():
         print(cb)
           
       st.write(response)
+
+     
+
+      # Define la lista de voces disponibles
+      voices = [
+          {"name": "Adam", "id": "1"},
+          {"name": "Antony", "id": "2"},
+          # Agrega las voces que desees utilizar
+      ]
+
+      # Define una lista con los nombres de las voces disponibles
+      voice_names = [voice["name"] for voice in voices]
+
+      # Agrega un campo de texto para ingresar el texto a convertir en audio
+      text = response
+      
+      # Agrega un menú desplegable para seleccionar la voz
+      voice_name = st.selectbox("Selecciona la voz", voice_names)
+
+      # Busca el ID de la voz seleccionada
+      voice_id = [voice["id"] for voice in voices if voice["name"] == voice_name][0]
+
+      # Genera el audio a partir del texto y la voz seleccionada
+      audio_datos = generate_audio(text, voice_id)
+      #display(Audio(audio_data, autoplay=True))
+      # Load audio data from file
+      with open(audio_datos, "rb") as f:
+          audio_data = f.read()
+
+      # Display audio player
+      # Genera el audio
+      audio_url = generate_audio("Hola, esto es una prueba", "eleven_multilingual_v1")
+
+      # Muestra el audio en la interfaz
+      ipd.display(ipd.Audio(audio_url))
+      
+      #st.audio(audio_data.export(format="mp3"), format="audio/mp3")
+
         
 def ytsub():
     load_dotenv()
