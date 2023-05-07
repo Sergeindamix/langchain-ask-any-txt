@@ -21,6 +21,7 @@ import IPython.display as ipd
 from elevenlabs import generate, play, set_api_key, voices, Models
 from pydub.playback import play as play_audio
 from io import BytesIO
+from audio_generator import interact_with_gpt4
       
 eleven_api_key = "cb5bafe60ce95aa3cd258c16bc2b1a4d"
 
@@ -65,8 +66,6 @@ def play_audio_file(file_path):
 
 def main():
     load_dotenv()
-    
-
     url = st.text_input("Ingresa link de YouTube, ejemplo: https://www.youtube.com/watch?v=KczJNtexinY")
     
     # extract video ID using regular expression
@@ -133,9 +132,7 @@ def main():
     
     # show user input
     user_question = st.text_input("Ask a question about YouTube VIDEO:")
-    if user_question:
-
-    
+    if user_question:    
       docs = knowledge_base.similarity_search(user_question)
       
       llm = OpenAI()
@@ -144,17 +141,40 @@ def main():
       
         response = chain.run(input_documents=docs, question=user_question)
         print(cb)
+
+      import docx
+
+      # Crear nuevo documento de Word
+      document = docx.Document()
+
+      # Agregar título
+      document.add_heading("Respuesta", level=1)
+
+      # Agregar subtítulo
+      document.add_heading("Pregunta del usuario:", level=2)
+      document.add_paragraph(user_question)
+
+      # Agregar subtítulo
+      document.add_heading("Respuesta:", level=2)
+      document.add_paragraph(response)
+
+      # Guardar documento en un archivo
+      document.save("respuesta_0.docx")
+
+      
+
+      counter = 0
+
+      while os.path.exists(f"respuesta_{counter}.docx"):
+          counter += 1
+
+      document.save(f"respuesta_{counter}.docx")
+
+
+
           
       st.write(response)
-
-      speed = st.slider("Velocidad de habla", 0.5, 2.0, 1.0, 0.1)
-      audio_segment = generate_audio(response, speed)
-      if audio_segment is not None:
-          st.write("Respuesta generada:")
-          # reproducir el audio generado
-          st.audio(audio_segment.export(format="wav"), format="audio/wav", start_time=0)
-
-        
+      
 def ytsub():
     load_dotenv()
     st.set_page_config(page_title="Ask your PDF")
