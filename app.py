@@ -21,7 +21,7 @@ import IPython.display as ipd
 from elevenlabs import generate, play, set_api_key, voices, Models
 from pydub.playback import play as play_audio
 from io import BytesIO
-from audio_generator import interact_with_gpt4
+
       
 eleven_api_key = "cb5bafe60ce95aa3cd258c16bc2b1a4d"
 
