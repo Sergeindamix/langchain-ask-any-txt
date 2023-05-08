@@ -9,6 +9,12 @@ from langchain.vectorstores import FAISS
 from langchain.chains.question_answering import load_qa_chain
 from langchain.llms import OpenAI
 from langchain.callbacks import get_openai_callback
+from langchain import memory
+from langchain.chains.conversation.base import ConversationChain
+from langchain.chat_models import ChatOpenAI 
+from langchain.chains import ConversationChain
+from langchain.memory import ConversationBufferMemory, ConversationEntityMemory
+from langchain.memory.prompt import ENTITY_MEMORY_CONVERSATION_TEMPLATE
 import os
 import textract
 import requests
@@ -21,7 +27,14 @@ import IPython.display as ipd
 from elevenlabs import generate, play, set_api_key, voices, Models
 from pydub.playback import play as play_audio
 from io import BytesIO
+import base64
 
+def download_file(file_path):
+    with open(file_path, 'rb') as f:
+        data = f.read()
+    b64 = base64.b64encode(data).decode('utf-8')
+    href = f'<a href="data:application/octet-stream;base64,{b64}" download="{file_path}">Descargar archivo</a>'
+    return href
       
 eleven_api_key = "cb5bafe60ce95aa3cd258c16bc2b1a4d"
 
@@ -143,6 +156,7 @@ def main():
         print(cb)
 
       import docx
+      
 
       # Crear nuevo documento de Word
       document = docx.Document()
@@ -170,10 +184,35 @@ def main():
 
       document.save(f"respuesta_{counter}.docx")
 
+      st.write(download_file(f"respuesta_{counter}.docx"), unsafe_allow_html=True)
+      
+      if os.getenv("OPENAI_API_KEY") is None or os.getenv("OPENAI_API_KEY") == "":
+        print("OPENAI_API_KEY is not set. Please add your key to .env")
+        exit(1)
+      else:
+        print("API key set")
 
+      llm = ChatOpenAI()
+      conversation = ConversationChain(
+          llm=llm,
+          memory=ConversationEntityMemory(llm=llm),
+          #memory=ConversationBufferMemory(),
+          prompt=ENTITY_MEMORY_CONVERSATION_TEMPLATE,
+          verbose = True
+      )
 
-          
+      st.write("hello, i am chatgpt cli!")
+      
+      user_input = response
+
+      ai_response = conversation.predict(input=user_input)
+
       st.write(response)
+
+      st.write("\nAssistant:\n", ai_response)
+      
+
+      
       
 def ytsub():
     load_dotenv()
