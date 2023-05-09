@@ -36,7 +36,7 @@ def download_file(file_path):
     href = f'<a href="data:application/octet-stream;base64,{b64}" download="{file_path}">Descargar archivo</a>'
     return href
       
-eleven_api_key = "cb5bafe60ce95aa3cd258c16bc2b1a4d"
+
 
 
 voice_list = voices()
