@@ -37,8 +37,8 @@ def download_file(file_path):
     href = f'<a href="data:application/octet-stream;base64,{b64}" download="{file_path}">Descargar archivo</a>'
     return href
       
-st.set_page_config(page_title="Ask your PDF")
-st.header("🦜🔗 Ask YouTube GPT or Docs  💬")
+st.set_page_config(page_title="🦜🔗 Ask YouTube or Docs💬")
+st.header("🦜🔗 Ask YouTube or Docs💬")
 
 
 voice_list = voices()
@@ -50,6 +50,7 @@ voice_id = st.selectbox("Selecciona una voz:", voice_labels)
 
 def main():
     load_dotenv()
+    st.header("🦜🔗 YouTube GPT💬")
     url = st.text_input("Ingresa link de YouTube, ejemplo: https://www.youtube.com/watch?v=KczJNtexinY")
     
     # extract video ID using regular expression
