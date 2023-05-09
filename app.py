@@ -192,7 +192,7 @@ def txts():
     st.header("Ask any txt[pdf, txt, docx] 💬")
     
     # upload file
-    uploaded_file = st.file_uploader("Upload your PDF", type=["pdf", "docx", "txt"])
+    uploaded_file = st.file_uploader("Upload your Document", type=["pdf", "docx", "txt"])
     
     # extract the text
     if uploaded_file is not None:
@@ -212,10 +212,11 @@ def txts():
                 text = docx2txt.process('uploaded_file.docx')
                 os.remove('uploaded_file.docx')
         elif uploaded_file.type == 'text/plain':
+            # handle non-PDF files            
             with open('uploaded_file.txt', 'wb') as f:
                 f.write(uploaded_file.read())
             if os.path.exists('uploaded_file.txt'):
-                text = uploaded_file.read().decode('utf-8')
+                text = textract.process('uploaded_file.txt').decode('utf-8')
                 os.remove('uploaded_file.txt')
 
                 ...
