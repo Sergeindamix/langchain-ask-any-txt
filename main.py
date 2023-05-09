@@ -29,7 +29,7 @@ from pydub.playback import play as play_audio
 from io import BytesIO
 
       
-eleven_api_key = "cb5bafe60ce95aa3cd258c16bc2b1a4d"
+
 
 
 voice_list = voices()
