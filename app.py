@@ -29,6 +29,22 @@ from pydub.playback import play as play_audio
 from io import BytesIO
 import base64
 import docx2txt
+from sd import sd
+
+st.set_page_config(page_title="🦜🔗 Ask YouTube or Docs💬")
+st.header("🦜🔗 Ask YouTube or Docs💬")
+
+# Create a toggle widget to generate image
+show_text = st.checkbox("Generar imagen?", value=False)
+
+# Display some text if the toggle is on
+if show_text:
+    # get user input
+    input_text = ""
+
+    sd(input_text)
+
+
 
 def download_file(file_path):
     with open(file_path, 'rb') as f:
@@ -68,14 +84,9 @@ def downloadDoc(user_question, response):
 
   st.write(download_file(f"respuesta_{counter}.docx"), unsafe_allow_html=True)
       
-st.set_page_config(page_title="🦜🔗 Ask YouTube or Docs💬")
-st.header("🦜🔗 Ask YouTube or Docs💬")
 
 
-voice_list = voices()
-voice_labels = [voice.category + " voice: " + voice.name for voice in voice_list]
 
-voice_id = st.selectbox("Selecciona una voz:", voice_labels)
 
 
 
@@ -186,7 +197,7 @@ def main():
       st.write("\nAssistant:\n", ai_response)
       
 
-      
+    
       
 def txts():
     load_dotenv()
