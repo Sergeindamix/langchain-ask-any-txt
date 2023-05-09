@@ -12,6 +12,7 @@ PyPDF2==3.0.1
 python-docx
 python-dotenv==1.0.0
 pytube
+replicate
 requests
 streamlit==1.18.1
 textract
