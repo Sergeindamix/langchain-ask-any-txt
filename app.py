@@ -28,6 +28,7 @@ from elevenlabs import generate, play, set_api_key, voices, Models
 from pydub.playback import play as play_audio
 from io import BytesIO
 import base64
+import docx2txt
 
 def download_file(file_path):
     with open(file_path, 'rb') as f:
@@ -36,7 +37,8 @@ def download_file(file_path):
     href = f'<a href="data:application/octet-stream;base64,{b64}" download="{file_path}">Descargar archivo</a>'
     return href
       
-
+st.set_page_config(page_title="Ask your PDF")
+st.header("🦜🔗 Ask YouTube GPT or Docs  💬")
 
 
 voice_list = voices()
@@ -44,38 +46,7 @@ voice_labels = [voice.category + " voice: " + voice.name for voice in voice_list
 
 voice_id = st.selectbox("Selecciona una voz:", voice_labels)
 
-def generate_audio(text, speed):
-    tts_url = f"https://api.elevenlabs.io/v1/text-to-speech/{voice_id}/stream"
 
-    headers = {
-        "Accept": "audio/mp3",
-        "xi-api-key": eleven_api_key
-    }
-
-    data = {
-        "text": text,
-        "voice_settings": {
-            "speed": speed
-        }
-    }
-
-    response = requests.post(tts_url, json=data, headers=headers, stream=True)
-
-    if response.status_code == 200:
-        # convert the streamed mp3 data to a playable audio format
-        audio_data = BytesIO(response.content)
-        audio_segment = AudioSegment.from_file(audio_data, format="mp3")
-        return audio_segment
-    else:
-        st.warning(f"No se pudo generar el audio. El servidor devolvió el código de estado {response.status_code}.")
-        return None
-
-
-
-
-def play_audio_file(file_path):
-    audio = AudioSegment.from_file(file_path)
-    play_audio(audio)
 
 def main():
     load_dotenv()
@@ -214,34 +185,38 @@ def main():
 
       
       
-def ytsub():
+def txts():
     load_dotenv()
-    st.set_page_config(page_title="Ask your PDF")
-    st.header("Ask your PDF 💬")
+    #st.set_page_config(page_title="Ask your PDF")
+    st.header("Ask any txt[pdf, txt, docx] 💬")
     
     # upload file
-    pdf = st.file_uploader("Upload your PDF", type=["pdf", "docx", "txt"])
+    uploaded_file = st.file_uploader("Upload your PDF", type=["pdf", "docx", "txt"])
     
     # extract the text
-    if pdf is not None:
-        if pdf.type == 'application/pdf':
+    if uploaded_file is not None:
+        if uploaded_file.type == 'application/pdf':
             with open('uploaded_file.pdf', 'wb') as f:
-                f.write(pdf.read())
+                f.write(uploaded_file.read())
             if os.path.exists('uploaded_file.pdf'):
                 text = textract.process('uploaded_file.pdf').decode('utf-8')
                 os.remove('uploaded_file.pdf')
             else:
                 # handle file not found error
                 ...
-        else:
-            # handle non-PDF files
-            with open('uploaded_file', 'wb') as f:
-                f.write(pdf.read())
-            if os.path.exists('uploaded_file'):
-                text = textract.process('uploaded_file').decode('utf-8')
-                os.remove('uploaded_file')
-            else:
-                # handle file not found error
+        elif uploaded_file.type == 'application/vnd.openxmlformats-officedocument.wordprocessingml.document':
+            with open('uploaded_file.docx', 'wb') as f:
+                f.write(uploaded_file.read())
+            if os.path.exists('uploaded_file.docx'):
+                text = docx2txt.process('uploaded_file.docx')
+                os.remove('uploaded_file.docx')
+        elif uploaded_file.type == 'text/plain':
+            with open('uploaded_file.txt', 'wb') as f:
+                f.write(uploaded_file.read())
+            if os.path.exists('uploaded_file.txt'):
+                text = uploaded_file.read().decode('utf-8')
+                os.remove('uploaded_file.txt')
+
                 ...
         
         # split into chunks
@@ -270,6 +245,7 @@ def ytsub():
                 
             st.write(response)
 
+txts()
 
 if __name__ == '__main__':
     main()
