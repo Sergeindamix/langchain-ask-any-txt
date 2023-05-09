@@ -36,6 +36,37 @@ def download_file(file_path):
     b64 = base64.b64encode(data).decode('utf-8')
     href = f'<a href="data:application/octet-stream;base64,{b64}" download="{file_path}">Descargar archivo</a>'
     return href
+
+def downloadDoc(user_question, response):
+  import docx
+      
+  # Crear nuevo documento de Word
+  document = docx.Document()
+
+  # Agregar título
+  document.add_heading("Respuesta", level=1)
+
+  # Agregar subtítulo
+  document.add_heading("Pregunta del usuario:", level=2)
+  document.add_paragraph(user_question)
+
+  # Agregar subtítulo
+  document.add_heading("Respuesta:", level=2)
+  document.add_paragraph(response)
+
+  # Guardar documento en un archivo
+  document.save("respuesta_0.docx")
+
+  
+
+  counter = 0
+
+  while os.path.exists(f"respuesta_{counter}.docx"):
+      counter += 1
+
+  document.save(f"respuesta_{counter}.docx")
+
+  st.write(download_file(f"respuesta_{counter}.docx"), unsafe_allow_html=True)
       
 st.set_page_config(page_title="🦜🔗 Ask YouTube or Docs💬")
 st.header("🦜🔗 Ask YouTube or Docs💬")
@@ -127,36 +158,7 @@ def main():
         response = chain.run(input_documents=docs, question=user_question)
         print(cb)
 
-      import docx
-      
-
-      # Crear nuevo documento de Word
-      document = docx.Document()
-
-      # Agregar título
-      document.add_heading("Respuesta", level=1)
-
-      # Agregar subtítulo
-      document.add_heading("Pregunta del usuario:", level=2)
-      document.add_paragraph(user_question)
-
-      # Agregar subtítulo
-      document.add_heading("Respuesta:", level=2)
-      document.add_paragraph(response)
-
-      # Guardar documento en un archivo
-      document.save("respuesta_0.docx")
-
-      
-
-      counter = 0
-
-      while os.path.exists(f"respuesta_{counter}.docx"):
-          counter += 1
-
-      document.save(f"respuesta_{counter}.docx")
-
-      st.write(download_file(f"respuesta_{counter}.docx"), unsafe_allow_html=True)
+      downloadDoc(user_question, response)
       
       if os.getenv("OPENAI_API_KEY") is None or os.getenv("OPENAI_API_KEY") == "":
         print("OPENAI_API_KEY is not set. Please add your key to .env")
@@ -189,7 +191,7 @@ def main():
 def txts():
     load_dotenv()
     #st.set_page_config(page_title="Ask your PDF")
-    st.header("Ask any txt[pdf, txt, docx] 💬")
+    st.header("[pdf, txt, docx] 💬")
     
     # upload file
     uploaded_file = st.file_uploader("Upload your Document", type=["pdf", "docx", "txt"])
@@ -246,6 +248,7 @@ def txts():
                 print(cb)
                 
             st.write(response)
+            downloadDoc(user_question, response)
 
 txts()
 
