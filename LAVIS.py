@@ -3,8 +3,6 @@ from PIL import Image
 
 import streamlit as st
 
-def generate_caption(image):
-  cation = model.generate({"image": image})
 
 
 def imgx(image_file):
