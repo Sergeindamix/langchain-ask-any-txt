@@ -45,7 +45,7 @@ if show_text:
     input_text = ""
 
     sd(input_text)
-    promptx(input_text)
+    promptx()
     img_path = "1.jpg"
     imgx(img_path)
 
