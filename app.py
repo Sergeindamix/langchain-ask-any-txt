@@ -106,7 +106,7 @@ def downloadDoc(user_question, response):
 
 def main():
     load_dotenv()
-    st.header("🦜🔗 YouTube GPT💬")
+    st.header("YouTube GPT💬")
     url = st.text_input("Ingresa link de YouTube, ejemplo: https://www.youtube.com/watch?v=KczJNtexinY")
     
     # extract video ID using regular expression
