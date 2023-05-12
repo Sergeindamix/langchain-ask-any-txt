@@ -50,7 +50,14 @@ if show_text:
     imgx(img_path)
 
     
-
+prompts = ['"Answer the question in the variable `question` about the image stored in the variable `image`. The question is in Spanish."', 
+'"Identify the oldest person in the `document` and create an image showcasing the result."', 
+'"Generate an image using the text given in the variable `caption`."', 
+'"Summarize the text given in the variable `text` and read it out loud."', 
+'"Answer the question in the variable `question` about the text in the variable `text`. Use the answer to generate an image."', 
+'"Caption the following `image`."', 
+'"<<prompt>>"']
+ptompt = st.selectbox("Selecciona un prompt:", prompts)
 
 
 def download_file(file_path):
@@ -180,6 +187,24 @@ def main():
 
       st.write(response)
       
+import transformers
+from transformers import pipeline
+
+def is_huggingface_langchain(question, text):
+    # initialize the question-answering pipeline
+    qa_pipeline = pipeline("question-answering", model="distilbert-base-cased-distilled-squad")
+
+    # find the answer to the question in the text
+    result = qa_pipeline(question=question, context=text)
+
+    # check if the answer contains the words "Hugging Face" and "LangChain"
+    answer = result["answer"]
+    if "Hugging Face" in answer and "LangChain" in answer:
+        st.write(result)
+        return True        
+    else:
+        st.write("error")
+        return answer
       
       
 def txts():
@@ -245,6 +270,13 @@ def txts():
             downloadDoc(user_question, response)
 
 txts()
+
+
+question = "What is the main topic of this text?"
+text = "The main topic of this text is the benefits of exercise for overall health and well-being. Studies have shown that regular physical activity can help reduce the risk of chronic diseases such as heart disease, diabetes, and cancer, as well as improve mental health and cognitive function."
+
+response = is_huggingface_langchain(question, text)
+st.write(response)
 
 if __name__ == '__main__':
     main()
