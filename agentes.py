@@ -21,7 +21,7 @@ model = AutoModel.from_pretrained(model_name)
 
 def text_downloader(url):
     response = agent.run(f"Summarize the text given in {url} and read it out loud.")
-    return response.text
+    return Audio("speech_converted.wav", autoplay=True)
     
 
 
@@ -59,7 +59,11 @@ def promptx():
 
     
     if st.button("Download Text"):
-        text = text_downloader(url)
+        #text = text_downloader(url)
+        if st.button("Activar agente"):
+          txt = summarizer(text)
+          st.write(type(txt))
+
         #st.write(f"The text is {text}")
 
     if st.button("Generate Audio"):
