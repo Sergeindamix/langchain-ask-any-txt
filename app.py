@@ -49,16 +49,18 @@ if show_text:
     img_path = "1.jpg"
     imgx(img_path)
 
+from transformers.tools import HfAgent
+agent = HfAgent("https://api-inference.huggingface.co/models/bigcode/starcoder")
+text = "The main topic of this text is the benefits of exercise for overall health and well-being. Studies have shown that regular physical activity can help reduce the risk of chronic diseases such as heart disease, diabetes, and cancer, as well as improve mental health and cognitive function."
     
 prompts = ['"Answer the question in the variable `question` about the image stored in the variable `image`. The question is in Spanish."', 
 '"Identify the oldest person in the `document` and create an image showcasing the result."', 
 '"Generate an image using the text given in the variable `caption`."', 
-'"Summarize the text given in the variable `text` and read it out loud."', 
+'f"Summarize the text given in {text} and read it out loud."', 
 '"Answer the question in the variable `question` about the text in the variable `text`. Use the answer to generate an image."', 
 '"Caption the following `image`."', 
 '"<<prompt>>"']
-ptompt = st.selectbox("Selecciona un prompt:", prompts)
-
+prompt = st.selectbox("Selecciona un prompt:", prompts)
 
 def download_file(file_path):
     with open(file_path, 'rb') as f:
@@ -106,7 +108,7 @@ def downloadDoc(user_question, response):
 
 def main():
     load_dotenv()
-    st.header("YouTube GPT💬")
+    st.header("🦜🔗 YouTube GPT💬")
     url = st.text_input("Ingresa link de YouTube, ejemplo: https://www.youtube.com/watch?v=KczJNtexinY")
     
     # extract video ID using regular expression
