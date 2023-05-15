@@ -1,11 +1,14 @@
+import databutton as db
+import streamlit as st
+import docx2txt
 import streamlit as st
 import re
 import os
 import textract
 from youtube_transcript_api import YouTubeTranscriptApi
+from langchain.vectorstores import SimilaritySearch
 
 # Load environment variables from a .env file if present
-load_dotenv()
 
 st.header("🦜🔗 YouTube GPT💬")
 url = st.text_input("Ingresa el enlace de YouTube (ejemplo: https://www.youtube.com/watch?v=KczJNtexinY)")
@@ -55,6 +58,20 @@ try:
     # Split the text into chunks
     chunks = split_text(text)
     st.write(chunks)
+
+    # Create an instance of SimilaritySearch
+    similarity_search = SimilaritySearch()
+
+    user_question = st.text_input("Ingresa pregunta")
+
+    # Find similar documents based on the user question and the chunks
+    docs = similarity_search.find_similar_documents(user_question, chunks)
+
+    # Process the docs to generate the response and download the document if needed
+    response = process_docs(docs)
+
+    # Display the response
+    st.write(response)
 
 except Exception as e:
     st.error(f"Error: {str(e)}")
