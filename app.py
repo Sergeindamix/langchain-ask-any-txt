@@ -32,6 +32,7 @@ import docx2txt
 from sd import sd
 from LAVIS import imgx
 from agentes import promptx
+from embds import embds
 
 st.set_page_config(page_title="🦜🔗 Ask YouTube or Docs💬")
 st.header("🦜🔗 Ask YouTube or Docs💬")
