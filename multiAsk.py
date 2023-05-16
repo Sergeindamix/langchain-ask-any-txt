@@ -1,4 +1,50 @@
 import streamlit as st
+from langchain.model_laboratory import ModelLaboratory
+from langchain.prompts import PromptTemplate
+overal_temperature = 0.1
+from langchain import PromptTemplate, HuggingFaceHub, LLMChain
+
+
+flan_20B = HuggingFaceHub(repo_id="google/flan-ul2", 
+                         model_kwargs={"temperature":overal_temperature, 
+                                       "max_new_tokens":200}
+                         ) 
+flan_t5xxl = HuggingFaceHub(repo_id="google/flan-t5-xxl", 
+                         model_kwargs={"temperature":overal_temperature, 
+                                       "max_new_tokens":200}
+                         )
+gpt_j6B = HuggingFaceHub(repo_id="EleutherAI/gpt-j-6B", 
+                         model_kwargs={"temperature":overal_temperature, 
+                                       "max_new_tokens":100}
+                         )
+from langchain.llms import OpenAI, OpenAIChat
+
+chatGPT_turbo = OpenAIChat(model_name='gpt-3.5-turbo', 
+             temperature=overal_temperature, 
+             max_tokens = 256,
+             )
+
+gpt3_davinici_003 = OpenAI(model_name='text-davinci-003', 
+             temperature=overal_temperature, 
+             max_tokens = 256,
+             )
+from langchain.llms import Cohere
+cohere_command_xl = Cohere(model='command-xlarge', 
+             temperature=0.1, 
+             max_tokens = 256)
+cohere_command_xl_nightly = Cohere(model='command-xlarge-nightly',
+             temperature=0.1, 
+             max_tokens = 256)
+template = """Question: {question}
+
+Answer: Let's think step by step."""
+prompt = PromptTemplate(template=template, input_variables=["question"])
+lab = ModelLaboratory.from_llms([
+                                 flan_20B,
+                                 cohere_command_xl, 
+                                 cohere_command_xl_nightly
+                                 ], prompt=prompt)
+question = st.text_input("What is the main topic of this text?")
 
 # Obtener los resultados de la comparación
 results = lab.compare(question)
