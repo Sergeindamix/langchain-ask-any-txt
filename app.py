@@ -33,6 +33,7 @@ from sd import sd
 from LAVIS import imgx
 from agentes import promptx
 from embds import embds
+from multiAsk import run_comparison
 
 st.set_page_config(page_title="🦜🔗 Ask YouTube or Docs💬")
 st.header("🦜🔗 Ask YouTube or Docs💬")
@@ -44,7 +45,25 @@ show_text = st.checkbox("Generar imagen?", value=False)
 if show_text:
     # get user input
     input_text = ""
+    question = st.text_input("What is the main topic of this text?")
 
+    # Invocar la función y obtener los resultados
+    results = run_comparison(question)
+
+    # Verificar si los resultados son None antes de iterar
+    if results is not None:
+        # Mostrar los resultados en Streamlit
+        for result in results:
+            model_name = result['model_name']
+            response = result['response']
+
+            # Mostrar el nombre del modelo y la respuesta generada
+            st.subheader(f"Modelo: {model_name}")
+            st.write(f"Respuesta: {response}")
+            st.write("---")  # Separador entre cada respuesta
+    else:
+        st.write("No se encontraron resultados.")
+    
     sd(input_text)
     promptx()
     img_path = "1.jpg"
