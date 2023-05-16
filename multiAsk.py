@@ -3,10 +3,7 @@ from langchain.model_laboratory import ModelLaboratory
 from langchain.prompts import PromptTemplate
 overal_temperature = 0.1
 from langchain import PromptTemplate, HuggingFaceHub, LLMChain
-import os
-os.environ['OPENAI_API_KEY'] = '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'
-os.environ["COHERE_API_KEY"] = "RHHr7yYclxRtRF5Pt0xmK4sQsacefaAe3n5EnXTq" #"iGcx36mfWxrjgSEIAq22FklWNovaeqG18xmaxu3n"
-os.environ["HUGGINGFACEHUB_API_TOKEN"] = "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"
+
 def run_comparison(question):
     overal_temperature = 0.1
     flan_20B = HuggingFaceHub(repo_id="google/flan-ul2",
