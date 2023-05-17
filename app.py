@@ -36,6 +36,7 @@ from embds import embds
 from multiAsk import run_comparison
 
 
+
 st.set_page_config(page_title="🦜🔗 Ask YouTube or Docs💬")
 st.header("🦜🔗 Ask YouTube or Docs💬")
 
@@ -322,7 +323,34 @@ if question:
   answer = answering(vector_store, question)
   st.write(answer)
    
+if st.button("show docs"):
+  #Check if the 'source_documents' directory exists
+  source_documents_dir = "/content/LAVIS/source_documents"
+  if not os.path.exists(source_documents_dir):
+      os.makedirs(source_documents_dir)
+      st.write(f"Created directory: {source_documents_dir}")
 
+  # ...
+
+  # Use 'source_documents_dir' in the file operations
+  context_files = [f for f in os.listdir(source_documents_dir) if os.path.isfile(os.path.join(source_documents_dir, f))]
+
+  # ...
+
+  context_files.sort()  # Ordenar los archivos alfabéticamente
+
+  # Mostrar la lista de archivos de contexto disponibles
+  st.sidebar.title("Archivos de Contexto")
+  selected_file = st.sidebar.selectbox("Selecciona un archivo de contexto", context_files)
+
+  # Leer el contenido del archivo de contexto seleccionado
+  with open(os.path.join("/content/LAVIS/source_documents", selected_file), "r", encoding="utf-8") as file:
+      context = file.read()
+
+  st.subheader("Contexto seleccionado:")
+  st.write(context)
+  #response = is_huggingface_langchain(question, text)
+  #st.write(response)
 
 if __name__ == '__main__':
     main()
