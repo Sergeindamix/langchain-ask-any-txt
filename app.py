@@ -306,7 +306,7 @@ st.write(response)
 # Example usage
 url = st.text_input("https://en.wikipedia.org/wiki/Cristiano_Ronaldo")
 if st.button("Generate embeddings"):
-  from preguntame import run_question_answering  
+  from embeddings import run_question_answering  
   st.session_state.vector_store = run_question_answering(url)
 
 # Retrieve the value of vector_store from session state
@@ -318,7 +318,7 @@ if "vector_store" in st.session_state:
 # show user input
 question = st.text_input("Ask a question about YouTube VIDEO:")
 if question:
-  from embeddings import answering
+  from preguntame import answering
   answer = answering(vector_store, question)
   st.write(answer)
    
