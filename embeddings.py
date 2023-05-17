@@ -25,8 +25,13 @@ def run_question_answering(url):
         match = re.search(r"v=(\w+)", url)
         if match:
             video_id = match.group(1)
+            # asigna la variable 'language_code' con el código de idioma deseado
+            idioma = st.selectbox("Selecciona el idioma de los subtitulos, si no existen mostrará error", ["en", "es", "fr"])
 
             try:
+                # Get the transcript in the desired language (e.g., "en" for English)
+                srt = YouTubeTranscriptApi.get_transcript(video_id, languages=[idioma])
+
                 # Get the transcript in the desired language (e.g., "en" for English)
                 srt = YouTubeTranscriptApi.get_transcript(video_id, languages=["en"])
 
