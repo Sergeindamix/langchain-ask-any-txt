@@ -1,77 +1,73 @@
-import databutton as db
-import streamlit as st
-import docx2txt
 import streamlit as st
 import re
 import os
 import textract
 from youtube_transcript_api import YouTubeTranscriptApi
-from langchain.vectorstores import SimilaritySearch
-
-# Load environment variables from a .env file if present
+from langchain.text_splitter import RecursiveCharacterTextSplitter
+from langchain.embeddings import HuggingFaceEmbeddings
+from langchain.vectorstores import FAISS
+from langchain.document_loaders import TextLoader
 
 st.header("🦜🔗 YouTube GPT💬")
-url = st.text_input("Ingresa el enlace de YouTube (ejemplo: https://www.youtube.com/watch?v=KczJNtexinY)")
+url = st.text_input("Ingresa link de YouTube, ejemplo: https://www.youtube.com/watch?v=KczJNtexinY")
 
-# Extract video ID using regular expression
+# extract video ID using regular expression
 match = re.search(r"v=(\w+)", url)
+# asigna la variable 'video_id' con el id del video de YouTube
 video_id = None
 
-if match:
-    video_id = match.group(1)
+if "youtu.be/" in url:
+    # extract video id from "https://youtu.be/video_id" format
+    video_id = url.split("youtu.be/")[-1]
+elif "watch?v=" in url:
+    # extract video id from "https://www.youtube.com/watch?v=video_id" format
+    video_id = url.split("watch?v=")[-1]
 
-idioma = st.selectbox("Selecciona el idioma de los subtítulos. Si no existen, mostrará un error.", ["en", "es", "fr"])
+# asigna la variable 'language_code' con el código de idioma deseado
+idioma = st.selectbox("Selecciona el idioma de los subtitulos, si no existen mostrará error", ["en", "es", "fr"])
 
-try:
-    # Get the transcript in the desired language
-    srt = YouTubeTranscriptApi.get_transcript(video_id, languages=[idioma])
+# obtiene el transcript en el idioma deseado
+srt = YouTubeTranscriptApi.get_transcript(video_id, languages=[idioma])
+# eliminar los caracteres de formato
+# extraer solo el texto de los subtítulos
+text = ""
+for subtitle in srt:
+    text += subtitle['text'] + " "
 
-    # Extract the text from the subtitles
-    text = " ".join([subtitle['text'] for subtitle in srt])
+    
+# eliminar los caracteres de formato
+text = text.replace('\n', ' ').replace('\r', '')
 
-    # Remove formatting characters
-    text = text.replace('\n', ' ').replace('\r', '')
+# Lee el archivo de subtítulos
+with open('subtitles.txt', 'w', encoding='utf-8') as file:
+  # escribir cada línea de subtítulos en el archivo
+  for line in srt:
+      text = line['text']
+      file.write(text + '\n')
 
-    # Write subtitles to a temporary file
-    with open('subtitles.txt', 'w', encoding='utf-8') as file:
-        file.write(text)
+if os.path.exists('subtitles.txt'):
+    text = textract.process('subtitles.txt').decode('utf-8')
+    os.remove('subtitles.txt')
+else:
+    # handle file not found error
+    ...
 
-    if os.path.exists('subtitles.txt'):
-        # Extract text from the temporary file
-        text = textract.process('subtitles.txt').decode('utf-8')
 
-        # Remove the temporary file
-        os.remove('subtitles.txt')
-    else:
-        st.error("Error: Subtitles file not found.")
-        st.stop()
+# Save the extracted text to a file
+with open("ronaldo.txt", "w") as f:
+    f.write(text)
 
-    # Define a function to split the text into chunks of 512 tokens
-    def split_text(text):
-        tokens = text.split()
-        chunks = []
-        for i in range(0, len(tokens), 512):
-            chunk = ' '.join(tokens[i:i+512])
-            chunks.append(chunk)
-        return chunks
+# Load the text using TextLoader
+loader = TextLoader("ronaldo.txt")
+document = loader.load()
 
-    # Split the text into chunks
-    chunks = split_text(text)
-    st.write(chunks)
+# Split the document into chunks
+text_splitter = RecursiveCharacterTextSplitter(chunk_size=1000, chunk_overlap=0, separators=[" ", ",", "\n"])
+docs = text_splitter.split_documents(document)
 
-    # Create an instance of SimilaritySearch
-    similarity_search = SimilaritySearch()
+# Create the FAISS vector store
+embedding = HuggingFaceEmbeddings()
+vector_store = FAISS.from_documents(docs, embedding)
 
-    user_question = st.text_input("Ingresa pregunta")
-
-    # Find similar documents based on the user question and the chunks
-    docs = similarity_search.find_similar_documents(user_question, chunks)
-
-    # Process the docs to generate the response and download the document if needed
-    response = process_docs(docs)
-
-    # Display the response
-    st.write(response)
-
-except Exception as e:
-    st.error(f"Error: {str(e)}")
+# Display the docs
+st.write(vector_store)
