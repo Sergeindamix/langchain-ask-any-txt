@@ -413,7 +413,7 @@ def ask_youtube_module():
 def ask_txt_module():
     st.header("Hacer preguntas sobre Texto")
     question = st.text_input("What is the main topic of this text?")
-    text = st.text_input("The main topic of this text is the benefits of exercise for overall health and well-being. Studies have shown that regular physical activity can help reduce the risk of chronic diseases such as heart disease, diabetes, and cancer, as well as improve mental health and cognitive function.")
+    text = st.text_input("The main topic of this text is The main topic of this text is El desarrollo de la inteligencia artificial (IA) plantea diversas implicaciones éticas y sociales. En un escenario donde la IA dicta la nueva moralidad y controla nuestra sociedad, es importante considerar cómo se establecerán los valores y el control sobre esta tecnología.")
     response = is_huggingface_langchain(question, text)
     st.write(response)
 
@@ -429,7 +429,7 @@ with st.sidebar:
     ''')
 
     # Lista desplegable para seleccionar el módulo
-    selected_module = st.selectbox('Seleccionar módulo', ['Crear imagen', 'Cargar documentos', 'Cargar URL', 'Hacer preguntas sobre YouTube', 'Hacer preguntas sobre Texto'])
+    selected_module = st.selectbox('Seleccionar módulo', ['None', 'Crear imagen', 'Cargar documentos', 'Cargar URL', 'Hacer preguntas sobre YouTube', 'Hacer preguntas sobre Texto'])
 
 # Contenido del módulo seleccionado
 if selected_module == 'Crear imagen':
