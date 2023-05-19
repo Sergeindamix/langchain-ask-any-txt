@@ -18,6 +18,7 @@ replicate
 requests
 sentence_transformers
 streamlit==1.18.1
+streamlit_extras
 textract
 tiktoken
 youtube-transcript-api
