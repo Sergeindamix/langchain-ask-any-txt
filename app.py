@@ -1,21 +1,26 @@
-from youtube_transcript_api import YouTubeTranscriptApi
-import re
-from dotenv import load_dotenv
 import streamlit as st
+from dotenv import load_dotenv
+import pickle
 from PyPDF2 import PdfReader
-from langchain.text_splitter import CharacterTextSplitter
+from streamlit_extras.add_vertical_space import add_vertical_space
+from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain.embeddings.openai import OpenAIEmbeddings
 from langchain.vectorstores import FAISS
-from langchain.chains.question_answering import load_qa_chain
 from langchain.llms import OpenAI
+from langchain.chains.question_answering import load_qa_chain
 from langchain.callbacks import get_openai_callback
+import os
+
+from youtube_transcript_api import YouTubeTranscriptApi
+import re
+from langchain.text_splitter import CharacterTextSplitter
 from langchain import memory
 from langchain.chains.conversation.base import ConversationChain
 from langchain.chat_models import ChatOpenAI 
 from langchain.chains import ConversationChain
 from langchain.memory import ConversationBufferMemory, ConversationEntityMemory
 from langchain.memory.prompt import ENTITY_MEMORY_CONVERSATION_TEMPLATE
-import os
+
 import textract
 import requests
 import io
@@ -50,9 +55,9 @@ with st.sidebar:
     - [LangChain](https://python.langchain.com/)
     - [OpenAI](https://platform.openai.com/docs/models) LLM model
  
-    ''')
-    add_vertical_space(5)
+    ''')    
     st.write('Made with ❤️ by [Sergeindamix](https://www.youtube.com/@believerofsound)')
+
 load_dotenv()
 
 # Create a toggle widget to generate image
@@ -204,7 +209,8 @@ def main():
 
     # split into chunks    
     chunks = split_text(text)
-    store_name = pdf.name[:-4]
+    
+    store_name = "datos"
     st.write(f'{store_name}')
     st.write(chunks)
     
@@ -300,10 +306,26 @@ def txts():
             length_function=len
         )
         chunks = text_splitter.split_text(text)
+        # split into chunks    
+        
+        
+        store_name = uploaded_file.name[:-4]
+        st.write(f'{store_name}')
+        st.write(chunks)
         
         # create embeddings
-        embeddings = OpenAIEmbeddings()
-        knowledge_base = FAISS.from_texts(chunks, embeddings)
+        if os.path.exists(f"{store_name}.pkl"):
+            with open(f"{store_name}.pkl", "rb") as f:
+                VectorStore = pickle.load(f)
+            # st.write('Embeddings Loaded from the Disk')s
+        else:
+            embeddings = OpenAIEmbeddings()
+            VectorStore = FAISS.from_texts(chunks, embedding=embeddings)
+            with open(f"{store_name}.pkl", "wb") as f:
+                pickle.dump(VectorStore, f)
+            #checar si funciona
+            knowledge_base = VectorStore
+       
         
         # show user input
         user_question = st.text_input("Ask a question about your PDF:")
