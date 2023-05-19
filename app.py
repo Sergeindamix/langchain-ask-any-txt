@@ -34,7 +34,7 @@ from pydub.playback import play as play_audio
 from io import BytesIO
 import base64
 import docx2txt
-from sd import sd
+
 from LAVIS import imgx
 from agentes import promptx
 from embds import embds
@@ -45,51 +45,38 @@ from multiAsk import run_comparison
 st.set_page_config(page_title="🦜🔗 Ask YouTube or Docs💬")
 st.header("🦜🔗 Ask YouTube or Docs💬")
 
-# Sidebar contents
-with st.sidebar:
-    st.title('🤗💬 LLM Chat App')
-    st.markdown('''
-    ## About
-    This app is an LLM-powered chatbot built using:
-    - [Streamlit](https://streamlit.io/)
-    - [LangChain](https://python.langchain.com/)
-    - [OpenAI](https://platform.openai.com/docs/models) LLM model
- 
-    ''')    
-    st.write('Made with ❤️ by [Sergeindamix](https://www.youtube.com/@believerofsound)')
 
-load_dotenv()
+def main():
+    # Create a toggle widget to generate image
+    show_text = st.checkbox("Generar imagen?", value=False)
 
-# Create a toggle widget to generate image
-show_text = st.checkbox("Generar imagen?", value=False)
+    # Display some text if the toggle is on
+    if show_text:
+        # get user input
+        input_text = ""
+        question = st.text_input("What is the main topic of this text?")
 
-# Display some text if the toggle is on
-if show_text:
-    # get user input
-    input_text = ""
-    question = st.text_input("What is the main topic of this text?")
+        # Invocar la función y obtener los resultados
+        results = run_comparison(question)
 
-    # Invocar la función y obtener los resultados
-    results = run_comparison(question)
+        # Verificar si los resultados son None antes de iterar
+        if results is not None:
+            # Mostrar los resultados en Streamlit
+            for result in results:
+                model_name = result['model_name']
+                response = result['response']
 
-    # Verificar si los resultados son None antes de iterar
-    if results is not None:
-        # Mostrar los resultados en Streamlit
-        for result in results:
-            model_name = result['model_name']
-            response = result['response']
-
-            # Mostrar el nombre del modelo y la respuesta generada
-            st.subheader(f"Modelo: {model_name}")
-            st.write(f"Respuesta: {response}")
-            st.write("---")  # Separador entre cada respuesta
-    else:
-        st.write("No se encontraron resultados.")
-    
-    sd(input_text)
-    promptx()
-    img_path = "1.jpg"
-    imgx(img_path)
+                # Mostrar el nombre del modelo y la respuesta generada
+                st.subheader(f"Modelo: {model_name}")
+                st.write(f"Respuesta: {response}")
+                st.write("---")  # Separador entre cada respuesta
+        else:
+            st.write("No se encontraron resultados.")
+        
+        
+        promptx()
+        img_path = "1.jpg"
+        imgx(img_path)
 
 from transformers.tools import HfAgent
 agent = HfAgent("https://api-inference.huggingface.co/models/bigcode/starcoder")
@@ -102,7 +89,7 @@ prompts = ['"Answer the question in the variable `question` about the image stor
 '"Answer the question in the variable `question` about the text in the variable `text`. Use the answer to generate an image."', 
 '"Caption the following `image`."', 
 '"<<prompt>>"']
-prompt = st.selectbox("Selecciona un prompt:", prompts)
+#prompt = st.selectbox("Selecciona un prompt:", prompts)
 
 def download_file(file_path):
     with open(file_path, 'rb') as f:
@@ -148,7 +135,7 @@ def downloadDoc(user_question, response):
 
 
 
-def main():
+def askYT():
     load_dotenv()
     st.header("🦜🔗 YouTube GPT💬")
     url = st.text_input("Ingresa link de YouTube, ejemplo: https://www.youtube.com/watch?v=KczJNtexinY")
@@ -341,64 +328,122 @@ def txts():
             st.write(response)
             downloadDoc(user_question, response)
 
-txts()
-
-
-question = "What is the main topic of this text?"
-text = "The main topic of this text is the benefits of exercise for overall health and well-being. Studies have shown that regular physical activity can help reduce the risk of chronic diseases such as heart disease, diabetes, and cancer, as well as improve mental health and cognitive function."
-
-response = is_huggingface_langchain(question, text)
-st.write(response)
 
 
 
-# Example usage
-url = st.text_input("https://en.wikipedia.org/wiki/Cristiano_Ronaldo")
-if st.button("Generate embeddings"):
-  from embeddings import run_question_answering  
-  st.session_state.vector_store = run_question_answering(url)
-
-# Retrieve the value of vector_store from session state
-if "vector_store" in st.session_state:
-    vector_store = st.session_state.vector_store
-    
 
 
-# show user input
-question = st.text_input("Ask a question about YouTube VIDEO:")
-if question:
-  from preguntame import answering
-  answer = answering(vector_store, question)
-  st.write(answer)
+
+
+
    
-if st.button("show docs"):
-  #Check if the 'source_documents' directory exists
-  source_documents_dir = "/content/LAVIS/source_documents"
-  if not os.path.exists(source_documents_dir):
-      os.makedirs(source_documents_dir)
-      st.write(f"Created directory: {source_documents_dir}")
 
-  # ...
 
-  # Use 'source_documents_dir' in the file operations
-  context_files = [f for f in os.listdir(source_documents_dir) if os.path.isfile(os.path.join(source_documents_dir, f))]
+  # Módulo: Crear imagen
+def create_image_module():
+    from PIL import Image
+    from sd import sd
+    st.header("Crear imagen")
+    # Agrega aquí el código para crear la imagen
+    question = ""
+    sd(question)
 
-  # ...
+# Módulo: Cargar documentos
+def load_documents_module():
+    st.header("Cargar documentos")
+    # Agrega aquí el código para cargar documentos
+    txts()
 
-  context_files.sort()  # Ordenar los archivos alfabéticamente
+# Módulo: Cargar URL
+def load_url_module():
+    st.header("Cargar URL")
+    # Agrega aquí el código para cargar URL    
+    url = st.text_input("https://en.wikipedia.org/wiki/Cristiano_Ronaldo")
+    if st.button("Generate embeddings"):
+      from embeddings import run_question_answering  
+      st.session_state.vector_store = run_question_answering(url)
 
-  # Mostrar la lista de archivos de contexto disponibles
-  st.sidebar.title("Archivos de Contexto")
-  selected_file = st.sidebar.selectbox("Selecciona un archivo de contexto", context_files)
+    # Retrieve the value of vector_store from session state
+    if "vector_store" in st.session_state:
+        vector_store = st.session_state.vector_store
+ 
+        # show user input
+        question = st.text_input("Ask a question about URL:")
+        if question:
+          from preguntame import answering
+          answer = answering(vector_store, question)
+          st.write(answer)
 
-  # Leer el contenido del archivo de contexto seleccionado
-  with open(os.path.join("/content/LAVIS/source_documents", selected_file), "r", encoding="utf-8") as file:
-      context = file.read()
+    if st.button("show docs"):
+      #Check if the 'source_documents' directory exists
+      source_documents_dir = "/content/LAVIS/source_documents"
+      if not os.path.exists(source_documents_dir):
+          os.makedirs(source_documents_dir)
+          st.write(f"Created directory: {source_documents_dir}")
 
-  st.subheader("Contexto seleccionado:")
-  st.write(context)
-  #response = is_huggingface_langchain(question, text)
-  #st.write(response)
+      # ...
+
+      # Use 'source_documents_dir' in the file operations
+      context_files = [f for f in os.listdir(source_documents_dir) if os.path.isfile(os.path.join(source_documents_dir, f))]
+
+      # ...
+
+      context_files.sort()  # Ordenar los archivos alfabéticamente
+
+      # Mostrar la lista de archivos de contexto disponibles
+      st.sidebar.title("Archivos de Contexto")
+      selected_file = st.sidebar.selectbox("Selecciona un archivo de contexto", context_files)
+
+      # Leer el contenido del archivo de contexto seleccionado
+      with open(os.path.join("/content/LAVIS/source_documents", selected_file), "r", encoding="utf-8") as file:
+          context = file.read()
+
+      st.subheader("Contexto seleccionado:")
+      st.write(context)
+      #response = is_huggingface_langchain(question, text)
+      #st.write(response)
+
+# Módulo: Hacer preguntas sobre YouTube
+def ask_youtube_module():
+    st.header("Hacer preguntas sobre YouTube")
+    # Agrega aquí el código para hacer preguntas sobre YouTube
+    askYT()
+
+# Módulo: Ask text
+def ask_txt_module():
+    st.header("Hacer preguntas sobre Texto")
+    question = st.text_input("What is the main topic of this text?")
+    text = st.text_input("The main topic of this text is the benefits of exercise for overall health and well-being. Studies have shown that regular physical activity can help reduce the risk of chronic diseases such as heart disease, diabetes, and cancer, as well as improve mental health and cognitive function.")
+    response = is_huggingface_langchain(question, text)
+    st.write(response)
+
+# Sidebar contents
+with st.sidebar:
+    st.title('🤗💬 LLM Chat App')
+    st.markdown('''
+    ## Acerca de:
+    Esta aplicación es un chatbot impulsado por LLM construido utilizando:
+    - [Streamlit](https://streamlit.io/)
+    - [LangChain](https://python.langchain.com/)
+    - [OpenAI](https://platform.openai.com/docs/models) LLM model
+    ''')
+
+    # Lista desplegable para seleccionar el módulo
+    selected_module = st.selectbox('Seleccionar módulo', ['Crear imagen', 'Cargar documentos', 'Cargar URL', 'Hacer preguntas sobre YouTube', 'Hacer preguntas sobre Texto'])
+
+# Contenido del módulo seleccionado
+if selected_module == 'Crear imagen':
+    create_image_module()
+elif selected_module == 'Cargar documentos':
+    load_documents_module()
+elif selected_module == 'Cargar URL':
+    load_url_module()
+elif selected_module == 'Hacer preguntas sobre YouTube':
+    ask_youtube_module()
+elif selected_module == 'Hacer preguntas sobre Texto':
+    ask_txt_module()
+
+load_dotenv()
 
 if __name__ == '__main__':
     main()
