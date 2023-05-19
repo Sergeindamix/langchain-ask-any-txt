@@ -189,16 +189,27 @@ def main():
 
     # split into chunks    
     chunks = split_text(text)
+    store_name = pdf.name[:-4]
+    st.write(f'{store_name}')
     st.write(chunks)
     
     # create embeddings
-    embeddings = OpenAIEmbeddings()
-    knowledge_base = FAISS.from_texts(chunks, embeddings)
-    
+    if os.path.exists(f"{store_name}.pkl"):
+        with open(f"{store_name}.pkl", "rb") as f:
+            VectorStore = pickle.load(f)
+        # st.write('Embeddings Loaded from the Disk')s
+    else:
+        embeddings = OpenAIEmbeddings()
+        VectorStore = FAISS.from_texts(chunks, embedding=embeddings)
+        with open(f"{store_name}.pkl", "wb") as f:
+            pickle.dump(VectorStore, f)
+        #checar si funciona
+        knowledge_base = VectorStore
+
     # show user input
     user_question = st.text_input("Ask a question about YouTube VIDEO:")
     if user_question:    
-      docs = knowledge_base.similarity_search(user_question)
+      docs = VectorStore.similarity_search(query=user_question, k=3)
       
       llm = OpenAI()
       chain = load_qa_chain(llm, chain_type="stuff")
