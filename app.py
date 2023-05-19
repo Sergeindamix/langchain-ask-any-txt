@@ -40,6 +40,21 @@ from multiAsk import run_comparison
 st.set_page_config(page_title="🦜🔗 Ask YouTube or Docs💬")
 st.header("🦜🔗 Ask YouTube or Docs💬")
 
+# Sidebar contents
+with st.sidebar:
+    st.title('🤗💬 LLM Chat App')
+    st.markdown('''
+    ## About
+    This app is an LLM-powered chatbot built using:
+    - [Streamlit](https://streamlit.io/)
+    - [LangChain](https://python.langchain.com/)
+    - [OpenAI](https://platform.openai.com/docs/models) LLM model
+ 
+    ''')
+    add_vertical_space(5)
+    st.write('Made with ❤️ by [Sergeindamix](https://www.youtube.com/@believerofsound)')
+load_dotenv()
+
 # Create a toggle widget to generate image
 show_text = st.checkbox("Generar imagen?", value=False)
 
