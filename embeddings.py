@@ -30,10 +30,7 @@ def run_question_answering(url):
 
             try:
                 # Get the transcript in the desired language (e.g., "en" for English)
-                srt = YouTubeTranscriptApi.get_transcript(video_id, languages=[idioma])
-
-                # Get the transcript in the desired language (e.g., "en" for English)
-                srt = YouTubeTranscriptApi.get_transcript(video_id, languages=["en"])
+                srt = YouTubeTranscriptApi.get_transcript(video_id, languages=[idioma])                
 
                 # Extract the text from the subtitles
                 text = " ".join([subtitle['text'] for subtitle in srt])
