@@ -418,7 +418,7 @@ def ask_txt_module():
     response = is_huggingface_langchain(question, text)
     st.write(response)
 
-# Módulo: Ask trans
+# Módulo: Ask transforms
 def ask_trans_module():
     from transformx import run_flan_t5
     line = st.text_input("Enter a sentence:")
@@ -436,7 +436,7 @@ with st.sidebar:
     ''')
 
     # Lista desplegable para seleccionar el módulo
-    selected_module = st.selectbox('Seleccionar módulo', ['None', 'Crear imagen', 'Cargar documentos', 'Cargar URL', 'Hacer preguntas sobre YouTube', 'Hacer preguntas sobre Texto', 'Ask trans'])
+    selected_module = st.selectbox('Seleccionar módulo', ['None', 'Crear imagen', 'Cargar documentos', 'Cargar URL', 'Hacer preguntas sobre YouTube', 'Hacer preguntas sobre Texto', 'Ask transforms'])
 
 
 
@@ -451,7 +451,7 @@ elif selected_module == 'Hacer preguntas sobre YouTube':
     ask_youtube_module()
 elif selected_module == 'Hacer preguntas sobre Texto':
     ask_txt_module()
-elif selected_module == 'Ask trans':
+elif selected_module == 'Ask transforms':
     ask_trans_module()
 
 
