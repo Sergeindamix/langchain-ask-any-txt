@@ -52,7 +52,7 @@ def main():
     show_text = st.checkbox("Generar imagen?", value=False)
 
     # Display some text if the toggle is on
-    if show_text:
+    if show_text:        
         # get user input
         input_text = ""
         question = st.text_input("What is the main topic of this text?")
@@ -424,6 +424,10 @@ def ask_trans_module():
     line = st.text_input("Enter a sentence:")
     run_flan_t5(line)
 
+# Módulo: descarga txt
+def down_txt():
+  import descargFile
+
 # Sidebar contents
 with st.sidebar:
     st.title('🤗💬 LLM Chat App')
@@ -436,7 +440,10 @@ with st.sidebar:
     ''')
 
     # Lista desplegable para seleccionar el módulo
-    selected_module = st.selectbox('Seleccionar módulo', ['None', 'Crear imagen', 'Cargar documentos', 'Cargar URL', 'Hacer preguntas sobre YouTube', 'Hacer preguntas sobre Texto', 'Ask transforms'])
+    selected_module = st.selectbox('Seleccionar módulo', 
+    ['None', 'Crear imagen', 'Cargar documentos', 'Cargar URL', 
+    'Hacer preguntas sobre YouTube', 'Hacer preguntas sobre Texto', 
+    'Ask transforms', 'descarga txt'])
 
 
 
@@ -453,6 +460,8 @@ elif selected_module == 'Hacer preguntas sobre Texto':
     ask_txt_module()
 elif selected_module == 'Ask transforms':
     ask_trans_module()
+elif selected_module == 'descarga txt':
+    down_txt()
 
 
 load_dotenv()
