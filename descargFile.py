@@ -8,6 +8,7 @@ def get_filename_from_url(url):
     filename = os.path.basename(parsed_url.path)
     return filename
 
+query = st.text_input("Who is the president")
 url = st.text_input("https://raw.githubusercontent.com/hwchase17/langchain/master/docs/modules/state_of_the_union.txt")
 res = requests.get(url)
 filename = get_filename_from_url(url)
@@ -20,7 +21,7 @@ with open(filename, "w") as f:
 from langchain.document_loaders import TextLoader
 loader = TextLoader(filename)
 documents = loader.load()
-st.write(documents)
+#st.write(documents)
 
 import textwrap
 
@@ -43,4 +44,16 @@ from langchain.text_splitter import CharacterTextSplitter
 text_splitter = CharacterTextSplitter(chunk_size=1000, chunk_overlap=0)
 docs = text_splitter.split_documents(documents)
 
-st.write(len(docs))
+#st.write(len(docs))
+
+# Embeddings
+from langchain.embeddings import HuggingFaceEmbeddings
+from langchain.vectorstores import FAISS
+
+embeddings = HuggingFaceEmbeddings()
+
+db = FAISS.from_documents(docs, embeddings)
+
+
+docs = db.similarity_search(query)
+st.write(wrap_text_preserve_newlines(str(docs[0].page_content)))
