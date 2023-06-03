@@ -3,6 +3,7 @@ docx2txt
 elevenlabs
 faiss-cpu
 flask
+hugchat
 huggingface_hub
 langchain==0.0.154
 moviepy
@@ -19,6 +20,7 @@ requests
 sentence_transformers
 streamlit==1.18.1
 streamlit_extras
+streamlit-chat
 textract
 tiktoken
 youtube-transcript-api
