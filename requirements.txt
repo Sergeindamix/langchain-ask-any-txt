@@ -1,6 +1,8 @@
+accelerate
 beautifulsoup4
 cohere
 docx2txt
+einops
 elevenlabs
 faiss-cpu
 flask
@@ -24,4 +26,5 @@ streamlit_extras
 streamlit-chat
 textract
 tiktoken
+transformers
 youtube-transcript-api
