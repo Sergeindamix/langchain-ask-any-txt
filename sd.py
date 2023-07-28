@@ -22,7 +22,7 @@ def sd(input_text):
 
     # create replicate model
     model = Replicate(
-        model="stability-ai/stable-diffusion:db21e45d3f7023abc2a46ee38a23973f6dce16bb082a930b0c49861f96d1e5bf",
+        model="stability-ai/sdxl:2b017d9b67edd2ee1401238df49d75da53c523f36e363881e057f5dc3ed3c5b2",
         input={"image_dimensions": "768x768"}
     )
 
