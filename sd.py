@@ -16,7 +16,7 @@ def sd(input_text):
     image_dimensions = st.text_input("Enter the image dimensions (e.g., 768x768)", "1024x1024")
 
     # Additional parameters
-    negative_prompt = st.text_input("Input Negative Prompt", "")
+    negative_prompt = st.text_input("Input Negative Prompt", "anime, cartoon, graphic, text, painting, crayon, graphite, abstract glitch, blurry")
     image_file = st.file_uploader("Input image for img2img or inpaint mode")
     mask_file = st.file_uploader("Input mask for inpaint mode. Black areas will be preserved, white areas will be inpainted.")
     width = st.slider("Width of output image", 1, 2048, 1024)
@@ -54,7 +54,7 @@ def sd(input_text):
     )
 
     # get user input
-    input_text = st.text_input("Enter a description of the image")
+    input_text = st.text_input("Enter a description of the image", "breathtaking {prompt} . award-winning, professional, highly detailed")
 
     if input_text:
         # generate image using replicate model
