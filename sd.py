@@ -1,5 +1,5 @@
 # get a token: https://replicate.com/account
-REPLICATE_API_TOKEN = "r8_brmwdLDHOD3znpSbSdz8OeUQfTLXujD1ttixD"
+REPLICATE_API_TOKEN = "r8_6YCe72HaolVMO7TuxmGkUAudrWjZEcY0aBonb"
 import os
 os.environ["REPLICATE_API_TOKEN"] = REPLICATE_API_TOKEN
 
