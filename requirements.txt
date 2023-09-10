@@ -6,7 +6,7 @@ faiss-cpu
 flask
 hugchat
 huggingface_hub
-langchain==0.0.154
+langchain
 moviepy
 openai
 pydub
@@ -25,3 +25,4 @@ streamlit-chat
 textract
 tiktoken
 youtube-transcript-api
+ctransformers
